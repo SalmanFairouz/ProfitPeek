@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: "Geist", "Helvetica Neue", Helvetica, sans-serif; -webkit-font-smoothing: antialiased; background: #F5F7F7; color: #0F1F26; }
+  a { color: #0F4C5C; text-decoration: none; }
+  a:hover { color: #14855F; text-decoration: underline; }
+  input, button, select, textarea { font-family: inherit; }
+  button:focus-visible, input:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline: 2px solid #0F4C5C; outline-offset: 2px; }
+  @keyframes pp-spin { to { transform: rotate(360deg); } }
+  @keyframes pp-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes pp-toast { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+  @keyframes pp-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+  @keyframes pp-shimmer { 0% { background-position: -240px 0; } 100% { background-position: 240px 0; } }
+</style>
+</helmet>
+
+<div style="min-height: 100vh; display: flex; flex-direction: column;">
+
+  <sc-if value="{{ signedOut }}" hint-placeholder-val="{{ true }}">
+    <div style="min-height: 100vh; display: grid; grid-template-columns: 1.05fr 1fr;">
+      <div style="background: linear-gradient(#0F4C5C, #0A323D); color: #EAF4F2; padding: 56px 56px 48px; display: flex; flex-direction: column; justify-content: space-between; min-height: 100vh;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 34px; height: 34px; border-radius: 10px; background: #17C98A; display: grid; place-items: center; color: #06232B; font-weight: 700; font-size: 17px;">P</div>
+          <span style="font-size: 17px; font-weight: 600; letter-spacing: -0.01em;">Profit Peak</span>
+        </div>
+        <div style="max-width: 420px; display: flex; flex-direction: column; gap: 22px;">
+          <h1 style="margin: 0; font-size: 42px; line-height: 1.1; font-weight: 600; letter-spacing: -0.03em; text-wrap: pretty;">Income statements, keyed in for you.</h1>
+          <p style="margin: 0; font-size: 16px; line-height: 1.6; color: #A9CBC9;">Drop a PDF, get structured financials in under 30 seconds — every figure flagged by extraction confidence so you know exactly what to double-check.</p>
+          <div style="display: flex; gap: 28px; padding-top: 8px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-family: 'Geist Mono', monospace; font-size: 24px; color: #17C98A;">18s</span>
+              <span style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #86AFAE;">Median extract</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-family: 'Geist Mono', monospace; font-size: 24px; color: #17C98A;">99.2%</span>
+              <span style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #86AFAE;">Line-item accuracy</span>
+            </div>
+          </div>
+        </div>
+        <span style="font-size: 12px; color: #7BA5A4;">SOC 2 Type II · Data never used for training</span>
+      </div>
+
+      <div style="display: grid; place-items: center; padding: 48px 40px; background: #FFFFFF;">
+        <div style="width: 100%; max-width: 384px; display: flex; flex-direction: column; gap: 26px; animation: pp-rise 0.35s ease both;">
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <h2 style="margin: 0; font-size: 27px; font-weight: 600; letter-spacing: -0.02em;">{{ authTitle }}</h2>
+            <p style="margin: 0; font-size: 14px; color: #5B7278;">{{ authSub }}</p>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <sc-if value="{{ isRegister }}" hint-placeholder-val="{{ false }}">
+              <label style="display: flex; flex-direction: column; gap: 7px; font-size: 13px; font-weight: 500; color: #33474D;">Full name
+                <input type="text" value="{{ regName }}" onChange="{{ onRegName }}" placeholder="Maya Chen" style="height: 44px; padding: 0 13px; border: 1px solid #D9E1E1; border-radius: 10px; font-size: 15px; color: #0F1F26; background: #FFFFFF; transition: border-color 0.15s ease, box-shadow 0.15s ease;" style-focus="border-color: #0F4C5C; box-shadow: 0 0 0 3px rgba(15,76,92,0.12); outline: none;" />
+              </label>
+            </sc-if>
+
+            <label style="display: flex; flex-direction: column; gap: 7px; font-size: 13px; font-weight: 500; color: #33474D;">Work email
+              <input type="email" value="{{ email }}" onChange="{{ onEmail }}" placeholder="you@company.com" aria-label="Work email" style="height: 44px; padding: 0 13px; border: 1px solid #D9E1E1; border-radius: 10px; font-size: 15px; color: #0F1F26; background: #FFFFFF; transition: border-color 0.15s ease, box-shadow 0.15s ease;" style-focus="border-color: #0F4C5C; box-shadow: 0 0 0 3px rgba(15,76,92,0.12); outline: none;" />
+            </label>
+
+            <label style="display: flex; flex-direction: column; gap: 7px; font-size: 13px; font-weight: 500; color: #33474D;">Password
+              <input type="password" value="{{ password }}" onChange="{{ onPassword }}" placeholder="••••••••" aria-label="Password" style="height: 44px; padding: 0 13px; border: 1px solid #D9E1E1; border-radius: 10px; font-size: 15px; color: #0F1F26; background: #FFFFFF; transition: border-color 0.15s ease, box-shadow 0.15s ease;" style-focus="border-color: #0F4C5C; box-shadow: 0 0 0 3px rgba(15,76,92,0.12); outline: none;" />
+            </label>
+
+            <sc-if value="{{ authError }}" hint-placeholder-val="{{ false }}">
+              <div role="alert" style="display: flex; gap: 9px; align-items: flex-start; padding: 11px 13px; border-radius: 10px; background: #FDEBEC; color: #96222B; font-size: 13px; line-height: 1.45;">
+                <span aria-hidden="true" style="font-weight: 700;">!</span>
+                <span>{{ authError }}</span>
+              </div>
+            </sc-if>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+              <label style="display: flex; align-items: center; gap: 9px; font-size: 13.5px; color: #33474D; cursor: pointer;">
+                <input type="checkbox" checked="{{ remember }}" onChange="{{ onRemember }}" style="width: 16px; height: 16px; accent-color: #0F4C5C; cursor: pointer;" />
+                Remember me
+              </label>
+              <a href="#" onClick="{{ onForgot }}" style="font-size: 13.5px; font-weight: 500;">Forgot password?</a>
+            </div>
+
+            <button type="button" onClick="{{ onSubmitAuth }}" style="height: 46px; border: none; border-radius: 10px; background: #0F4C5C; color: #FFFFFF; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.15s ease, transform 0.1s ease; margin-top: 4px;" style-hover="background: #0B3A47;" style-active="transform: translateY(1px);">{{ authCta }}</button>
+
+            <p style="margin: 4px 0 0; font-size: 13.5px; color: #5B7278; text-align: center;">{{ authSwapLead }}
+              <a href="#" onClick="{{ onSwapAuth }}" style="font-weight: 600;">{{ authSwapLink }}</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}">
+    <div style="display: flex; min-height: 100vh; align-items: stretch;">
+
+      <nav aria-label="Main" style="width: 248px; flex: none; background: #FFFFFF; border-right: 1px solid #E4EAEA; padding: 22px 16px; display: flex; flex-direction: column; gap: 26px; position: sticky; top: 0; height: 100vh;">
+        <div style="display: flex; align-items: center; gap: 11px; padding: 0 8px;">
+          <div style="width: 30px; height: 30px; border-radius: 9px; background: #0F4C5C; display: grid; place-items: center; color: #17C98A; font-weight: 700; font-size: 15px;">P</div>
+          <span style="font-size: 15.5px; font-weight: 600; letter-spacing: -0.01em;">Profit Peak</span>
+        </div>
+
+        <button type="button" onClick="{{ onStartUpload }}" style="height: 42px; border: none; border-radius: 10px; background: #17C98A; color: #06232B; font-size: 14.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.15s ease, transform 0.1s ease;" style-hover="background: #12B87D;" style-active="transform: translateY(1px);">
+          <span aria-hidden="true" style="font-size: 17px; line-height: 1;">+</span> Upload New PDF
+        </button>
+
+        <div style="display: flex; flex-direction: column; gap: 3px;">
+          <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="3">
+            <button type="button" onClick="{{ item.onClick }}" aria-current="{{ item.current }}" style="display: flex; align-items: center; gap: 11px; height: 40px; padding: 0 11px; border: none; border-radius: 9px; background: {{ item.bg }}; color: {{ item.fg }}; font-size: 14.5px; font-weight: {{ item.weight }}; cursor: pointer; text-align: left; transition: background 0.14s ease;" style-hover="background: #EEF3F3;">
+              <span aria-hidden="true" style="width: 7px; height: 7px; border-radius: 50%; background: {{ item.dot }};"></span>
+              {{ item.label }}
+            </button>
+          </sc-for>
+        </div>
+
+        <div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #EDF1F1; padding-top: 14px;">
+          <div style="display: flex; align-items: center; gap: 10px; padding: 0 6px;">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: #E3EDEC; color: #0F4C5C; display: grid; place-items: center; font-size: 13px; font-weight: 600;">{{ userInitials }}</div>
+            <div style="display: flex; flex-direction: column; min-width: 0;">
+              <span style="font-size: 13.5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ userName }}</span>
+              <span style="font-size: 12px; color: #7C9093;">Analyst · Acme Capital</span>
+            </div>
+          </div>
+          <button type="button" onClick="{{ onLogout }}" style="height: 36px; border: 1px solid #E4EAEA; border-radius: 9px; background: #FFFFFF; color: #5B7278; font-size: 13.5px; font-weight: 500; cursor: pointer; transition: background 0.14s ease, color 0.14s ease;" style-hover="background: #F5F7F7; color: #0F1F26;">Log out</button>
+        </div>
+      </nav>
+
+      <main style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+
+        <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+          <div style="padding: 34px 40px 56px; display: flex; flex-direction: column; gap: 28px; animation: pp-rise 0.3s ease both;">
+            <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap;">
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <h1 style="margin: 0; font-size: 29px; font-weight: 600; letter-spacing: -0.025em;">{{ greeting }}</h1>
+                <p style="margin: 0; font-size: 14.5px; color: #5B7278;">{{ dashSub }}</p>
+              </div>
+              <button type="button" onClick="{{ onStartUpload }}" style="height: 48px; padding: 0 22px; border: none; border-radius: 11px; background: #0F4C5C; color: #FFFFFF; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 20px -12px rgba(15,76,92,0.7); transition: background 0.15s ease, transform 0.1s ease;" style-hover="background: #0B3A47;" style-active="transform: translateY(1px);">
+                <span aria-hidden="true" style="font-size: 18px; line-height: 1;">↑</span> Upload New PDF
+              </button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px;">
+              <sc-for list="{{ stats }}" as="stat" hint-placeholder-count="3">
+                <div style="background: #FFFFFF; border: 1px solid #E4EAEA; border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 7px;">
+                  <span style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #7C9093;">{{ stat.label }}</span>
+                  <span style="font-family: 'Geist Mono', monospace; font-size: 26px; font-weight: 500; letter-spacing: -0.02em;">{{ stat.value }}</span>
+                  <span style="font-size: 13px; color: #14855F;">{{ stat.note }}</span>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+                <h2 style="margin: 0; font-size: 17px; font-weight: 600;">Your reports</h2>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <input type="search" value="{{ query }}" onChange="{{ onQuery }}" placeholder="Search company or file…" aria-label="Search reports" style="height: 38px; width: 240px; padding: 0 13px; border: 1px solid #D9E1E1; border-radius: 10px; background: #FFFFFF; font-size: 14px; transition: border-color 0.15s ease, box-shadow 0.15s ease;" style-focus="border-color: #0F4C5C; box-shadow: 0 0 0 3px rgba(15,76,92,0.12); outline: none;" />
+                  <div style="display: flex; gap: 4px; background: #ECF1F1; padding: 3px; border-radius: 10px;">
+                    <sc-for list="{{ filters }}" as="f" hint-placeholder-count="3">
+                      <button type="button" onClick="{{ f.onClick }}" style="height: 32px; padding: 0 13px; border: none; border-radius: 8px; background: {{ f.bg }}; color: {{ f.fg }}; font-size: 13.5px; font-weight: 500; cursor: pointer; transition: background 0.14s ease;">{{ f.label }}</button>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+
+              <sc-if value="{{ hasResults }}" hint-placeholder-val="{{ true }}">
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(288px, 1fr)); gap: 16px;">
+                  <sc-for list="{{ visibleReports }}" as="r" hint-placeholder-count="4">
+                    <div onClick="{{ r.onOpen }}" role="button" tabIndex="0" onKeyDown="{{ r.onKey }}" aria-label="{{ r.aria }}" style="background: #FFFFFF; border: 1px solid #E4EAEA; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 14px; cursor: pointer; transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;" style-hover="border-color: #C6D4D4; box-shadow: 0 14px 30px -22px rgba(11,50,61,0.55); transform: translateY(-2px);">
+                      <div style="height: 116px; border-radius: 10px; background: repeating-linear-gradient(135deg, #F2F6F6 0 8px, #EAF0F0 8px 16px); border: 1px solid #E9EEEE; display: flex; flex-direction: column; justify-content: space-between; padding: 12px;">
+                        <span style="font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: 0.06em; color: #8A9C9F;">INCOME STATEMENT</span>
+                        <span style="font-family: 'Geist Mono', monospace; font-size: 20px; color: #0F4C5C;">{{ r.revenue }}</span>
+                      </div>
+                      <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <span style="font-size: 15.5px; font-weight: 600; letter-spacing: -0.01em;">{{ r.company }}</span>
+                        <span style="font-size: 13px; color: #7C9093; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ r.filename }}</span>
+                      </div>
+                      <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; border-top: 1px solid #EFF3F3; padding-top: 12px;">
+                        <span style="font-size: 12.5px; color: #7C9093;">{{ r.date }}</span>
+                        <span style="font-size: 11.5px; font-weight: 600; padding: 4px 9px; border-radius: 999px; background: {{ r.statusBg }}; color: {{ r.statusFg }};">{{ r.status }}</span>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+                <div style="background: #FFFFFF; border: 1px dashed #D3DEDE; border-radius: 14px; padding: 48px 24px; text-align: center; display: flex; flex-direction: column; gap: 8px; align-items: center;">
+                  <span style="font-size: 16px; font-weight: 600;">No reports match “{{ query }}”</span>
+                  <span style="font-size: 14px; color: #7C9093;">Try a different company name, or upload a new statement.</span>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isUpload }}" hint-placeholder-val="{{ false }}">
+          <div style="padding: 34px 40px 56px; display: flex; flex-direction: column; gap: 26px; max-width: 1040px; width: 100%; animation: pp-rise 0.3s ease both;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <button type="button" onClick="{{ onGoDashboard }}" aria-label="Back to dashboard" style="width: 34px; height: 34px; border: 1px solid #E4EAEA; border-radius: 9px; background: #FFFFFF; color: #5B7278; font-size: 15px; cursor: pointer; transition: background 0.14s ease;" style-hover="background: #F0F4F4;">←</button>
+              <h1 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.02em;">New extraction</h1>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <sc-for list="{{ steps }}" as="s" hint-placeholder-count="3">
+                <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+                  <span style="width: 26px; height: 26px; flex: none; border-radius: 50%; background: {{ s.bg }}; color: {{ s.fg }}; display: grid; place-items: center; font-size: 12.5px; font-weight: 600;">{{ s.n }}</span>
+                  <span style="font-size: 13.5px; font-weight: 500; color: {{ s.labelFg }};">{{ s.label }}</span>
+                  <span style="flex: 1; height: 2px; background: {{ s.lineBg }}; border-radius: 2px;"></span>
+                </div>
+              </sc-for>
+            </div>
+
+            <sc-if value="{{ step1 }}" hint-placeholder-val="{{ true }}">
+              <div onClick="{{ onPickFile }}" role="button" tabIndex="0" onKeyDown="{{ onPickKey }}" aria-label="Choose a PDF to upload" onDragOver="{{ onDragOver }}" onDragLeave="{{ onDragLeave }}" onDrop="{{ onDrop }}" style="background: {{ dropBg }}; border: 2px dashed {{ dropBorder }}; border-radius: 16px; padding: 72px 32px; display: flex; flex-direction: column; align-items: center; gap: 14px; cursor: pointer; transition: background 0.16s ease, border-color 0.16s ease;">
+                <div style="width: 54px; height: 54px; border-radius: 14px; background: #E7F1EF; color: #0F4C5C; display: grid; place-items: center; font-size: 22px;" aria-hidden="true">↑</div>
+                <span style="font-size: 18px; font-weight: 600; letter-spacing: -0.01em;">Drag your income statement here</span>
+                <span style="font-size: 14px; color: #6B8084;">PDF up to 20 MB · or <span style="color: #0F4C5C; font-weight: 600; text-decoration: underline;">browse files</span></span>
+              </div>
+              <div style="display: flex; gap: 10px; align-items: center; font-size: 13px; color: #7C9093;">
+                <span aria-hidden="true">🔒</span> Files are processed in-region and deleted from temp storage after extraction.
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ step2 }}" hint-placeholder-val="{{ false }}">
+              <div style="background: #FFFFFF; border: 1px solid #E4EAEA; border-radius: 16px; padding: 40px; display: flex; flex-direction: column; gap: 26px;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                  <span aria-hidden="true" style="width: 34px; height: 34px; border-radius: 50%; border: 3px solid #E1EAE9; border-top-color: #17C98A; animation: pp-spin 0.9s linear infinite;"></span>
+                  <div style="display: flex; flex-direction: column; gap: 3px;">
+                    <span style="font-size: 17px; font-weight: 600; letter-spacing: -0.01em;">Claude is extracting your statement…</span>
+                    <span aria-live="polite" style="font-size: 13.5px; color: #6B8084;">{{ extractMsg }}</span>
+                  </div>
+                </div>
+                <div style="height: 8px; border-radius: 999px; background: #EDF2F2; overflow: hidden;">
+                  <div style="height: 100%; width: {{ progressPct }}; background: linear-gradient(90deg, #0F4C5C, #17C98A); border-radius: 999px; transition: width 0.4s ease;"></div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                  <sc-for list="{{ skeletons }}" as="sk" hint-placeholder-count="5">
+                    <div style="height: 16px; width: {{ sk.w }}; border-radius: 6px; background: linear-gradient(90deg, #EFF3F3 0%, #E4EBEB 50%, #EFF3F3 100%); background-size: 240px 100%; animation: pp-shimmer 1.2s linear infinite;"></div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ step3 }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 18px;">
+                <div style="background: #E9F8F1; border: 1px solid #C7EBDB; border-radius: 13px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+                  <span style="font-size: 14px; color: #0B5B3F;">Extracted <strong>{{ draftCount }} line items</strong> from {{ draftFile }} · {{ draftFlagged }}</span>
+                  <span style="font-family: 'Geist Mono', monospace; font-size: 13px; color: #14855F;">{{ draftElapsed }}</span>
+                </div>
+
+                <div style="background: #FFFFFF; border: 1px solid #E4EAEA; border-radius: 16px; overflow: hidden;">
+                  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: #EDF1F1;">
+                    <sc-for list="{{ draftMeta }}" as="m" hint-placeholder-count="3">
+                      <div style="background: #FFFFFF; padding: 16px 20px; display: flex; flex-direction: column; gap: 6px;">
+                        <span style="font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #8A9C9F;">{{ m.label }}</span>
+                        <input type="text" value="{{ m.value }}" onChange="{{ m.onChange }}" aria-label="{{ m.label }}" style="border: 1px solid transparent; border-radius: 8px; padding: 5px 7px; margin: -5px -7px; font-size: 15px; font-weight: 500; color: #0F1F26; background: transparent; transition: border-color 0.14s ease, background 0.14s ease;" style-hover="background: #F5F8F8;" style-focus="border-color: #0F4C5C; background: #FFFFFF; box-shadow: 0 0 0 3px rgba(15,76,92,0.1); outline: none;" />
+                      </div>
+                    </sc-for>
+                  </div>
+
+                  <table style="width: 100%; border-collapse: collapse; border-top: 1px solid #EDF1F1;">
+                    <thead>
+                      <tr style="background: #FAFCFC;">
+                        <th scope="col" style="text-align: left; padding: 11px 20px; font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #8A9C9F; font-weight: 600;">Line item</th>
+                        <th scope="col" style="text-align: right; padding: 11px 20px; font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #8A9C9F; font-weight: 600;">Amount (USD)</th>
+                        <th scope="col" style="text-align: right; padding: 11px 20px; font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #8A9C9F; font-weight: 600;">Confidence</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <sc-for list="{{ draftRows }}" as="row" hint-placeholder-count="8">
+                        <tr style="border-top: 1px solid #F1F5F5; transition: background 0.12s ease;" style-hover="background: #FAFCFC;">
+                          <td style="padding: 9px 20px; font-size: 14.5px; color: #33474D;">{{ row.label }}</td>
+                          <td style="padding: 9px 20px; text-align: right;">
+                            <input type="text" value="{{ row.value }}" onChange="{{ row.onChange }}" aria-label="{{ row.aria }}" style="width: 160px; text-align: right; border: 1px solid transparent; border-radius: 8px; padding: 7px 9px; font-family: 'Geist Mono', monospace; font-size: 14px; color: #0F1F26; background: transparent; transition: border-color 0.14s ease, background 0.14s ease;" style-hover="background: #F2F6F6;" style-focus="border-color: #0F4C5C; background: #FFFFFF; box-shadow: 0 0 0 3px rgba(15,76,92,0.1); outline: none;" />
+                          </td>
+                          <td style="padding: 9px 20px; text-align: right;">
+                            <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; padding: 4px 9px; border-radius: 999px; background: {{ row.confBg }}; color: {{ row.confFg }};">{{ row.confLabel }}</span>
+                          </td>
+                        </tr>
+                      </sc-for>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px;">
+                  <button type="button" onClick="{{ onGoDashboard }}" style="height: 44px; padding: 0 18px; border: 1px solid #DCE4E4; border-radius: 10px; background: #FFFFFF; color: #33474D; font-size: 14.5px; font-weight: 500; cursor: pointer; transition: background 0.14s ease;" style-hover="background: #F3F7F7;">Discard</button>
+                  <button type="button" onClick="{{ onSaveDraft }}" style="height: 44px; padding: 0 22px; border: none; border-radius: 10px; background: #17C98A; color: #06232B; font-size: 14.5px; font-weight: 600; cursor: pointer; transition: background 0.15s ease, transform 0.1s ease;" style-hover="background: #12B87D;" style-active="transform: translateY(1px);">Save report</button>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+          <div style="padding: 34px 40px 56px; display: flex; flex-direction: column; gap: 22px; max-width: 1040px; width: 100%; animation: pp-rise 0.3s ease both;">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+              <div style="display: flex; gap: 14px; align-items: flex-start;">
+                <button type="button" onClick="{{ onGoDashboard }}" aria-label="Back to dashboard" style="width: 34px; height: 34px; margin-top: 3px; border: 1px solid #E4EAEA; border-radius: 9px; background: #FFFFFF; color: #5B7278; font-size: 15px; cursor: pointer; transition: background 0.14s ease;" style-hover="background: #F0F4F4;">←</button>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                  <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em;">{{ detail.company }}</h1>
+                  <span style="font-size: 13.5px; color: #7C9093;">{{ detail.filename }} · {{ detail.period }} · saved {{ detail.date }}</span>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 9px;">
+                <span aria-live="polite" style="font-size: 13px; color: {{ saveFg }}; min-width: 92px; text-align: right;">{{ saveLabel }}</span>
+                <button type="button" onClick="{{ onToggleEdit }}" style="height: 40px; padding: 0 16px; border: 1px solid #DCE4E4; border-radius: 10px; background: {{ editBg }}; color: {{ editFg }}; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.14s ease;">{{ editLabel }}</button>
+                <button type="button" onClick="{{ onDownload }}" style="height: 40px; padding: 0 16px; border: 1px solid #DCE4E4; border-radius: 10px; background: #FFFFFF; color: #33474D; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.14s ease;" style-hover="background: #F3F7F7;">Download CSV</button>
+                <button type="button" onClick="{{ onAskDelete }}" aria-label="Delete report" style="height: 40px; padding: 0 16px; border: 1px solid #F2D6D8; border-radius: 10px; background: #FFFFFF; color: #A8262F; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.14s ease;" style-hover="background: #FDF1F2;">Delete</button>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 4px; border-bottom: 1px solid #E4EAEA;">
+              <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="2">
+                <button type="button" onClick="{{ t.onClick }}" aria-current="{{ t.current }}" style="height: 42px; padding: 0 15px; border: none; background: transparent; color: {{ t.fg }}; font-size: 14.5px; font-weight: {{ t.weight }}; cursor: pointer; border-bottom: 2px solid {{ t.line }}; transition: color 0.14s ease;">{{ t.label }}</button>
+              </sc-for>
+            </div>
+
+            <sc-if value="{{ tabData }}" hint-placeholder-val="{{ true }}">
+              <div style="display: flex; flex-direction: column; gap: 16px;">
+                <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px;">
+                  <sc-for list="{{ detailSummary }}" as="d" hint-placeholder-count="4">
+                    <div style="background: #FFFFFF; border: 1px solid #E4EAEA; border-radius: 13px; padding: 15px 17px; display: flex; flex-direction: column; gap: 6px;">
+                      <span style="font-size: 11.5px; letter-spacing: 0.07em; text-transform: uppercase; color: #8A9C9F;">{{ d.label }}</span>
+                      <span style="font-family: 'Geist Mono', monospace; font-size: 20px; letter-spacing: -0.01em; color: {{ d.fg }};">{{ d.value }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+
+                <div style="background: #FFFFFF; border: 1px solid #E4EAEA; border-radius: 16px; overflow: hidden;">
+                  <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                      <tr style="background: #FAFCFC;">
+                        <th scope="col" onClick="{{ onSortLabel }}" style="text-align: left; padding: 12px 20px; font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #8A9C9F; font-weight: 600; cursor: pointer;">Line item {{ sortArrowLabel }}</th>
+                        <th scope="col" onClick="{{ onSortValue }}" style="text-align: right; padding: 12px 20px; font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #8A9C9F; font-weight: 600; cursor: pointer;">Amount (USD) {{ sortArrowValue }}</th>
+                        <th scope="col" style="text-align: right; padding: 12px 20px; font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #8A9C9F; font-weight: 600;">Confidence</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <sc-for list="{{ detailRows }}" as="row" hint-placeholder-count="8">
+                        <tr style="border-top: 1px solid #F1F5F5; transition: background 0.12s ease;" style-hover="background: #FAFCFC;">
+                          <td style="padding: 11px 20px; font-size: 14.5px; color: #33474D; font-weight: {{ row.weight }};">{{ row.label }}</td>
+                          <td style="padding: 11px 20px; text-align: right;">
+                            <sc-if value="{{ editing }}" hint-placeholder-val="{{ false }}">
+                              <input type="text" value="{{ row.value }}" onChange="{{ row.onChange }}" aria-label="{{ row.aria }}" style="width: 160px; text-align: right; border: 1px solid #E1E9E9; border-radius: 8px; padding: 7px 9px; font-family: 'Geist Mono', monospace; font-size: 14px; color: #0F1F26; background: #FFFFFF; transition: border-color 0.14s ease;" style-focus="border-color: #0F4C5C; box-shadow: 0 0 0 3px rgba(15,76,92,0.1); outline: none;" />
+                            </sc-if>
+                            <sc-if value="{{ notEditing }}" hint-placeholder-val="{{ true }}">
+                              <span style="font-family: 'Geist Mono', monospace; font-size: 14.5px;">{{ row.value }}</span>
+                            </sc-if>
+                          </td>
+                          <td style="padding: 11px 20px; text-align: right;">
+                            <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; padding: 4px 9px; border-radius: 999px; background: {{ row.confBg }}; color: {{ row.confFg }};">{{ row.confLabel }}</span>
+                          </td>
+                        </tr>
+                      </sc-for>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ tabPdf }}" hint-placeholder-val="{{ false }}">
+              <div style="background: #FFFFFF; border: 1px solid #E4EAEA; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px; align-items: center;">
+                <div style="width: 100%; max-width: 620px; aspect-ratio: 8.5 / 11; border: 1px solid #E9EEEE; border-radius: 10px; background: repeating-linear-gradient(180deg, #FAFCFC 0 22px, #F3F7F7 22px 24px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;">
+                  <span style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.08em; color: #8A9C9F;">ORIGINAL PDF PREVIEW</span>
+                  <span style="font-size: 13.5px; color: #A2B1B3;">{{ detail.filename }} · page 1 of 3</span>
+                </div>
+                <span style="font-size: 13px; color: #7C9093;">Source document, unmodified. Extraction never edits the original.</span>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+          <div style="padding: 34px 40px 56px; display: flex; flex-direction: column; gap: 22px; max-width: 760px; animation: pp-rise 0.3s ease both;">
+            <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em;">Settings</h1>
+
+            <div style="background: #FFFFFF; border: 1px solid #E4EAEA; border-radius: 16px; padding: 22px 24px; display: flex; flex-direction: column; gap: 18px;">
+              <h2 style="margin: 0; font-size: 15.5px; font-weight: 600;">Account</h2>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                <label style="display: flex; flex-direction: column; gap: 7px; font-size: 13px; font-weight: 500; color: #33474D;">Name
+                  <input type="text" value="{{ userName }}" onChange="{{ onUserName }}" style="height: 42px; padding: 0 12px; border: 1px solid #D9E1E1; border-radius: 10px; font-size: 14.5px;" style-focus="border-color: #0F4C5C; box-shadow: 0 0 0 3px rgba(15,76,92,0.12); outline: none;" />
+                </label>
+                <label style="display: flex; flex-direction: column; gap: 7px; font-size: 13px; font-weight: 500; color: #33474D;">Email
+                  <input type="email" value="{{ email }}" onChange="{{ onEmail }}" style="height: 42px; padding: 0 12px; border: 1px solid #D9E1E1; border-radius: 10px; font-size: 14.5px;" style-focus="border-color: #0F4C5C; box-shadow: 0 0 0 3px rgba(15,76,92,0.12); outline: none;" />
+                </label>
+              </div>
+            </div>
+
+            <div style="background: #FFFFFF; border: 1px solid #E4EAEA; border-radius: 16px; padding: 22px 24px; display: flex; flex-direction: column; gap: 6px;">
+              <h2 style="margin: 0 0 12px; font-size: 15.5px; font-weight: 600;">Extraction preferences</h2>
+              <sc-for list="{{ prefs }}" as="p" hint-placeholder-count="3">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 12px 0; border-top: 1px solid #F2F5F5;">
+                  <div style="display: flex; flex-direction: column; gap: 3px;">
+                    <span style="font-size: 14.5px; font-weight: 500;">{{ p.label }}</span>
+                    <span style="font-size: 13px; color: #7C9093;">{{ p.help }}</span>
+                  </div>
+                  <button type="button" onClick="{{ p.onToggle }}" role="switch" aria-checked="{{ p.checked }}" aria-label="{{ p.label }}" style="width: 46px; height: 26px; flex: none; border: none; border-radius: 999px; background: {{ p.trackBg }}; cursor: pointer; position: relative; transition: background 0.16s ease;">
+                    <span aria-hidden="true" style="position: absolute; top: 3px; left: {{ p.knobLeft }}; width: 20px; height: 20px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 1px 3px rgba(6,35,43,0.3); transition: left 0.16s ease;"></span>
+                  </button>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="background: #FFFFFF; border: 1px solid #E4EAEA; border-radius: 16px; padding: 22px 24px; display: flex; flex-direction: column; gap: 14px;">
+              <h2 style="margin: 0; font-size: 15.5px; font-weight: 600;">API key</h2>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <code style="flex: 1; font-family: 'Geist Mono', monospace; font-size: 13.5px; background: #F5F8F8; border: 1px solid #E7EDED; border-radius: 10px; padding: 11px 13px; color: #33474D; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ apiKeyShown }}</code>
+                <button type="button" onClick="{{ onToggleKey }}" style="height: 42px; padding: 0 14px; border: 1px solid #DCE4E4; border-radius: 10px; background: #FFFFFF; color: #33474D; font-size: 14px; font-weight: 500; cursor: pointer;" style-hover="background: #F3F7F7;">{{ keyToggleLabel }}</button>
+                <button type="button" onClick="{{ onCopyKey }}" style="height: 42px; padding: 0 14px; border: none; border-radius: 10px; background: #0F4C5C; color: #FFFFFF; font-size: 14px; font-weight: 600; cursor: pointer;" style-hover="background: #0B3A47;">Copy</button>
+              </div>
+              <span style="font-size: 13px; color: #7C9093;">Rotating the key invalidates existing integrations immediately.</span>
+            </div>
+          </div>
+        </sc-if>
+
+      </main>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ deleteOpen }}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-modal="true" aria-label="Delete report" style="position: fixed; inset: 0; background: rgba(8,32,39,0.45); display: grid; place-items: center; padding: 24px; z-index: 60;">
+      <div style="background: #FFFFFF; border-radius: 16px; padding: 26px; width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 30px 70px -30px rgba(6,35,43,0.6); animation: pp-rise 0.2s ease both;">
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+          <h2 style="margin: 0; font-size: 18px; font-weight: 600;">Delete this report?</h2>
+          <button type="button" onClick="{{ onCloseDelete }}" aria-label="Close dialog" style="width: 30px; height: 30px; border: none; border-radius: 8px; background: #F2F5F5; color: #5B7278; font-size: 15px; cursor: pointer;" style-hover="background: #E7ECEC;">×</button>
+        </div>
+        <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: #5B7278;">{{ deleteBody }}</p>
+        <div style="display: flex; justify-content: flex-end; gap: 10px; padding-top: 4px;">
+          <button type="button" onClick="{{ onCloseDelete }}" style="height: 42px; padding: 0 16px; border: 1px solid #DCE4E4; border-radius: 10px; background: #FFFFFF; color: #33474D; font-size: 14.5px; font-weight: 500; cursor: pointer;" style-hover="background: #F3F7F7;">Cancel</button>
+          <button type="button" onClick="{{ onConfirmDelete }}" style="height: 42px; padding: 0 18px; border: none; border-radius: 10px; background: #B02730; color: #FFFFFF; font-size: 14.5px; font-weight: 600; cursor: pointer;" style-hover="background: #971F27;">Delete report</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <div aria-live="polite" style="position: fixed; right: 22px; bottom: 22px; display: flex; flex-direction: column; gap: 10px; z-index: 80;">
+    <sc-for list="{{ toasts }}" as="t" hint-placeholder-count="0">
+      <div style="display: flex; align-items: center; gap: 11px; min-width: 260px; padding: 13px 15px; border-radius: 12px; background: #0B323D; color: #EAF4F2; font-size: 14px; box-shadow: 0 18px 40px -22px rgba(6,35,43,0.8); animation: pp-toast 0.22s ease both;">
+        <span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; flex: none; background: {{ t.dot }};"></span>
+        <span style="flex: 1;">{{ t.msg }}</span>
+        <button type="button" onClick="{{ t.onClose }}" aria-label="Dismiss notification" style="border: none; background: transparent; color: #8FB2B0; font-size: 15px; cursor: pointer; padding: 0 2px;" style-hover="color: #EAF4F2;">×</button>
+      </div>
+    </sc-for>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;userName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Maya Chen&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Demo data&quot;},&quot;showConfidence&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behavior&quot;},&quot;extractSeconds&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:3.2,&quot;min&quot;:0.5,&quot;max&quot;:8,&quot;step&quot;:0.1,&quot;unit&quot;:&quot;s&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Behavior&quot;}}">
+const CONF = {
+  high: { label: "High", bg: "#E7F7EF", fg: "#0B7A4B" },
+  med: { label: "Check", bg: "#FFF4E1", fg: "#8A5A08" },
+  low: { label: "Low", bg: "#FDEBEC", fg: "#A8262F" }
+};
+const tier = (c) => (c >= 0.95 ? "high" : c >= 0.85 ? "med" : "low");
+const fmt = (n) => n.toLocaleString("en-US");
+const parse = (s) => Number(String(s).replace(/[^0-9.-]/g, "")) || 0;
+
+const items = (v) => [
+  { label: "Revenue", value: v[0], conf: 0.99 },
+  { label: "Cost of revenue", value: v[1], conf: 0.98 },
+  { label: "Gross profit", value: v[2], conf: 0.99, bold: true },
+  { label: "Research & development", value: v[3], conf: 0.93 },
+  { label: "Sales & marketing", value: v[4], conf: 0.96 },
+  { label: "General & administrative", value: v[5], conf: 0.82 },
+  { label: "Operating income", value: v[6], conf: 0.97, bold: true },
+  { label: "Interest expense", value: v[7], conf: 0.88 },
+  { label: "Income tax", value: v[8], conf: 0.94 },
+  { label: "Net income", value: v[9], conf: 0.98, bold: true }
+];
+
+const SEED = [
+  { id: 1, company: "Northwind Logistics", filename: "northwind-q2-2026-is.pdf", period: "Q2 2026", date: "Aug 18, 2026", status: "Reviewed", items: items([48250000, 29940000, 18310000, 2110000, 6420000, 3980000, 5800000, 640000, 1210000, 3950000]) },
+  { id: 2, company: "Halcyon Materials", filename: "halcyon_FY25_income_statement.pdf", period: "FY 2025", date: "Aug 11, 2026", status: "Needs review", items: items([112400000, 74120000, 38280000, 8940000, 12300000, 7150000, 9890000, 1740000, 2010000, 6140000]) },
+  { id: 3, company: "Bright Harbor Foods", filename: "bhf-2026-06-consolidated.pdf", period: "H1 2026", date: "Jul 29, 2026", status: "Reviewed", items: items([26780000, 17420000, 9360000, 480000, 3980000, 2240000, 2660000, 310000, 590000, 1760000]) },
+  { id: 4, company: "Cascade Robotics", filename: "cascade-robotics-q1.pdf", period: "Q1 2026", date: "Jul 14, 2026", status: "Draft", items: items([9420000, 5810000, 3610000, 2740000, 1180000, 890000, -1200000, 96000, 0, -1296000]) }
+];
+
+const MSGS = ["Reading page structure…", "Locating the income statement table…", "Normalizing line items and periods…", "Scoring extraction confidence…"];
+
+class Component extends DCLogic {
+  state = {
+    authed: false, authMode: "login", email: "maya@acmecapital.com", password: "", regName: "", remember: true, authError: null,
+    route: "dashboard", query: "", filter: "All", reports: SEED, openId: 1,
+    step: 1, dragging: false, progress: 0, msg: MSGS[0], draft: null,
+    editing: false, tab: "data", saveState: "idle", sort: null, sortDir: 1,
+    deleteId: null, toasts: [], prefs: { autoSave: true, flagLow: true, keepPdf: false }, showKey: false,
+    userName: null, nameOverride: null
+  };
+
+  componentDidMount() {
+    this._key = (e) => {
+      if (e.key === "Escape") this.setState({ deleteOpen: false, deleteId: null });
+    };
+    window.addEventListener("keydown", this._key);
+  }
+  componentWillUnmount() {
+    window.removeEventListener("keydown", this._key);
+    clearInterval(this._iv); clearTimeout(this._to); clearTimeout(this._save);
+  }
+
+  toast(msg, dot) {
+    const id = Date.now() + Math.random();
+    this.setState((s) => ({ toasts: [...s.toasts, { id, msg, dot: dot || "#17C98A" }] }));
+    setTimeout(() => this.setState((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })), 3600);
+  }
+
+  go(route) { this.setState({ route, editing: false, saveState: "idle" }); }
+
+  runExtraction(name) {
+    clearInterval(this._iv); clearTimeout(this._to);
+    const secs = Number(this.props.extractSeconds ?? 3.2);
+    this.setState({ route: "upload", step: 2, progress: 4, msg: MSGS[0], dragging: false, draftName: name });
+    const started = Date.now();
+    this._iv = setInterval(() => {
+      this.setState((s) => {
+        const p = Math.min(97, s.progress + 100 / (secs * 10));
+        return { progress: p, msg: MSGS[Math.min(MSGS.length - 1, Math.floor((p / 100) * MSGS.length))] };
+      });
+    }, 100);
+    this._to = setTimeout(() => {
+      clearInterval(this._iv);
+      this.setState({
+        progress: 100, step: 3,
+        draft: {
+          company: "Vantage Grid Energy", period: "Q2 2026", currency: "USD", filename: name,
+          elapsed: ((Date.now() - started) / 1000).toFixed(1) + "s",
+          items: items([64180000, 41260000, 22920000, 3410000, 7860000, 4520000, 7130000, 980000, 1490000, 4660000])
+        }
+      });
+    }, secs * 1000);
+  }
+
+  current() { return this.state.reports.find((r) => r.id === this.state.openId) || this.state.reports[0]; }
+
+  editItem(where, i, raw) {
+    const val = parse(raw);
+    if (where === "draft") {
+      this.setState((s) => ({ draft: { ...s.draft, items: s.draft.items.map((it, k) => (k === i ? { ...it, value: val } : it)) } }));
+      return;
+    }
+    this.setState((s) => ({
+      saveState: "saving",
+      reports: s.reports.map((r) => (r.id === s.openId ? { ...r, items: r.items.map((it, k) => (k === i ? { ...it, value: val } : it)) } : r))
+    }));
+    clearTimeout(this._save);
+    this._save = setTimeout(() => {
+      this.setState({ saveState: "saved" });
+      if (this.state.prefs.autoSave) this.toast("Changes auto-saved");
+    }, 800);
+  }
+
+  mapRows(list, where) {
+    const show = this.props.showConfidence ?? true;
+    return (list || []).map((it, i) => {
+      const t = CONF[tier(it.conf)];
+      return {
+        label: it.label, value: fmt(it.value), weight: it.bold ? 600 : 400,
+        aria: it.label + " amount",
+        confBg: show ? t.bg : "#F3F6F6", confFg: show ? t.fg : "#A2B1B3",
+        confLabel: show ? t.label : "—",
+        onChange: (e) => this.editItem(where, i, e.target.value)
+      };
+    });
+  }
+
+  saveDraft() {
+    const d = this.state.draft;
+    const id = Date.now();
+    this.setState((s) => ({
+      reports: [{ id, company: d.company, filename: d.filename, period: d.period, date: "Aug 24, 2026", status: "Reviewed", items: d.items }, ...s.reports],
+      openId: id, route: "detail", tab: "data", step: 1, draft: null, editing: false, saveState: "saved"
+    }));
+    this.toast("Report saved");
+  }
+
+  renderVals() {
+    const s = this.state, p = this.props;
+    const userName = s.nameOverride ?? (p.userName || "Maya Chen");
+    const reg = s.authMode === "register";
+    const q = s.query.trim().toLowerCase();
+
+    const visible = s.reports.filter((r) => {
+      const okQ = !q || r.company.toLowerCase().includes(q) || r.filename.toLowerCase().includes(q);
+      const okF = s.filter === "All" || (s.filter === "Needs review" ? r.status !== "Reviewed" : r.status === "Reviewed");
+      return okQ && okF;
+    });
+
+    const d = this.current() || { items: [] };
+    let rows = this.mapRows(d.items, "report");
+    if (s.sort === "label") rows = [...rows].sort((a, b) => a.label.localeCompare(b.label) * s.sortDir);
+    if (s.sort === "value") rows = [...rows].sort((a, b) => (parse(a.value) - parse(b.value)) * s.sortDir);
+
+    const val = (i) => ((d.items || [])[i] || {}).value || 0;
+    const margin = val(0) ? Math.round((val(9) / val(0)) * 1000) / 10 : 0;
+
+    const statusColor = (st) => (st === "Reviewed" ? { bg: "#E7F7EF", fg: "#0B7A4B" } : st === "Draft" ? { bg: "#EEF2F3", fg: "#5B7278" } : { bg: "#FFF4E1", fg: "#8A5A08" });
+
+    const navDef = [
+      { key: "dashboard", label: "Dashboard" },
+      { key: "detail", label: "Reports" },
+      { key: "settings", label: "Settings" }
+    ];
+
+    const stepDef = [
+      { n: "1", label: "Upload", at: 1 },
+      { n: "2", label: "Extract", at: 2 },
+      { n: "3", label: "Review", at: 3 }
+    ];
+
+    const prefDef = [
+      { key: "autoSave", label: "Auto-save while editing", help: "Persist field edits without a save click." },
+      { key: "flagLow", label: "Flag low-confidence figures", help: "Highlight any value Claude is unsure about." },
+      { key: "keepPdf", label: "Retain original PDFs", help: "Keep source files in storage after extraction." }
+    ];
+
+    const flagged = (this.state.draft ? this.state.draft.items : []).filter((it) => it.conf < 0.9).length;
+
+    return {
+      signedOut: !s.authed, signedIn: s.authed,
+      isRegister: reg,
+      authTitle: reg ? "Create your account" : "Sign in to Profit Peak",
+      authSub: reg ? "Free while you're evaluating — 25 statements included." : "Pick up where you left off.",
+      authCta: reg ? "Create account" : "Sign in",
+      authSwapLead: reg ? "Already have an account?" : "New to Profit Peak?",
+      authSwapLink: reg ? "Sign in" : "Create one",
+      authError: s.authError,
+      email: s.email, password: s.password, regName: s.regName, remember: s.remember,
+      onEmail: (e) => this.setState({ email: e.target.value, authError: null }),
+      onPassword: (e) => this.setState({ password: e.target.value, authError: null }),
+      onRegName: (e) => this.setState({ regName: e.target.value }),
+      onRemember: (e) => this.setState({ remember: e.target.checked }),
+      onForgot: (e) => { e.preventDefault(); this.toast("Reset link sent to " + (s.email || "your inbox"), "#7FD8F5"); },
+      onSwapAuth: (e) => { e.preventDefault(); this.setState({ authMode: reg ? "login" : "register", authError: null }); },
+      onSubmitAuth: () => {
+        if (!s.email.includes("@")) return this.setState({ authError: "Enter a valid work email address." });
+        if (s.password.length < 6) return this.setState({ authError: "Password must be at least 6 characters." });
+        if (reg && !s.regName.trim()) return this.setState({ authError: "Tell us your name so we can label your reports." });
+        this.setState({ authed: true, route: "dashboard", nameOverride: reg && s.regName ? s.regName : null });
+        this.toast(reg ? "Account created — welcome aboard" : "Signed in");
+      },
+
+      userName, userInitials: userName.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase(),
+      onUserName: (e) => this.setState({ nameOverride: e.target.value }),
+      onLogout: () => { this.setState({ authed: false, password: "", route: "dashboard" }); this.toast("Signed out", "#8FB2B0"); },
+
+      navItems: navDef.map((n) => {
+        const on = s.route === n.key || (n.key === "detail" && s.route === "upload");
+        return {
+          label: n.label, current: on ? "page" : undefined,
+          bg: on ? "#E9F1F1" : "transparent", fg: on ? "#0F4C5C" : "#4C6469",
+          weight: on ? 600 : 500, dot: on ? "#17C98A" : "#C7D4D5",
+          onClick: () => this.go(n.key === "detail" ? "dashboard" : n.key)
+        };
+      }),
+
+      isDashboard: s.route === "dashboard", isUpload: s.route === "upload", isDetail: s.route === "detail", isSettings: s.route === "settings",
+      greeting: "Welcome back, " + userName.split(" ")[0],
+      dashSub: s.reports.length + " statements extracted · " + s.reports.filter((r) => r.status !== "Reviewed").length + " waiting on your review",
+      stats: [
+        { label: "Statements", value: String(s.reports.length), note: "+2 this week" },
+        { label: "Avg extract time", value: "18.4s", note: "Well under target" },
+        { label: "Fields auto-filled", value: "1,284", note: "97% accepted as-is" }
+      ],
+      query: s.query, onQuery: (e) => this.setState({ query: e.target.value }),
+      filters: ["All", "Needs review", "Reviewed"].map((f) => ({
+        label: f, bg: s.filter === f ? "#FFFFFF" : "transparent", fg: s.filter === f ? "#0F4C5C" : "#5B7278",
+        onClick: () => this.setState({ filter: f })
+      })),
+      hasResults: visible.length > 0, noResults: visible.length === 0,
+      visibleReports: visible.map((r) => {
+        const c = statusColor(r.status);
+        const open = () => this.setState({ openId: r.id, route: "detail", tab: "data", editing: false, saveState: "idle", sort: null });
+        return {
+          company: r.company, filename: r.filename, date: r.date, status: r.status,
+          statusBg: c.bg, statusFg: c.fg, revenue: "$" + (r.items[0].value / 1000000).toFixed(1) + "M",
+          aria: "Open report for " + r.company,
+          onOpen: open,
+          onKey: (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } }
+        };
+      }),
+
+      onStartUpload: () => this.setState({ route: "upload", step: 1, draft: null, progress: 0 }),
+      onGoDashboard: () => { clearInterval(this._iv); clearTimeout(this._to); this.setState({ route: "dashboard", step: 1, draft: null }); },
+      steps: stepDef.map((st) => {
+        const done = s.step > st.at, on = s.step === st.at;
+        return {
+          n: done ? "✓" : st.n, label: st.label,
+          bg: on ? "#0F4C5C" : done ? "#17C98A" : "#E6ECEC",
+          fg: on || done ? "#FFFFFF" : "#8A9C9F",
+          labelFg: on || done ? "#0F1F26" : "#8A9C9F",
+          lineBg: done ? "#17C98A" : "#E6ECEC"
+        };
+      }),
+      step1: s.step === 1, step2: s.step === 2, step3: s.step === 3 && !!s.draft,
+      dropBg: s.dragging ? "#E9F8F1" : "#FFFFFF",
+      dropBorder: s.dragging ? "#17C98A" : "#CFDCDC",
+      onDragOver: (e) => { e.preventDefault(); if (!s.dragging) this.setState({ dragging: true }); },
+      onDragLeave: () => this.setState({ dragging: false }),
+      onDrop: (e) => { e.preventDefault(); const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; this.runExtraction(f ? f.name : "vantage-grid-q2-2026.pdf"); },
+      onPickFile: () => this.runExtraction("vantage-grid-q2-2026.pdf"),
+      onPickKey: (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); this.runExtraction("vantage-grid-q2-2026.pdf"); } },
+      progressPct: Math.round(s.progress) + "%", extractMsg: s.msg,
+      skeletons: ["72%", "54%", "88%", "40%", "66%"].map((w) => ({ w })),
+
+      draftFile: s.draft ? s.draft.filename : "",
+      draftCount: s.draft ? s.draft.items.length : 0,
+      draftElapsed: s.draft ? s.draft.elapsed : "",
+      draftFlagged: flagged ? flagged + " need a quick check" : "all high confidence",
+      draftMeta: s.draft ? [
+        { label: "Company", value: s.draft.company, onChange: (e) => this.setState({ draft: { ...s.draft, company: e.target.value } }) },
+        { label: "Period", value: s.draft.period, onChange: (e) => this.setState({ draft: { ...s.draft, period: e.target.value } }) },
+        { label: "Currency", value: s.draft.currency, onChange: (e) => this.setState({ draft: { ...s.draft, currency: e.target.value } }) }
+      ] : [],
+      draftRows: s.draft ? this.mapRows(s.draft.items, "draft") : [],
+      onSaveDraft: () => this.saveDraft(),
+
+      detail: { company: d.company, filename: d.filename, period: d.period, date: d.date },
+      tabs: [{ k: "data", label: "Extracted data" }, { k: "pdf", label: "Original PDF" }].map((t) => ({
+        label: t.label, current: s.tab === t.k ? "page" : undefined,
+        fg: s.tab === t.k ? "#0F4C5C" : "#7C9093", weight: s.tab === t.k ? 600 : 500,
+        line: s.tab === t.k ? "#0F4C5C" : "transparent",
+        onClick: () => this.setState({ tab: t.k })
+      })),
+      tabData: s.tab === "data", tabPdf: s.tab === "pdf",
+      detailSummary: [
+        { label: "Revenue", value: "$" + fmt(val(0)), fg: "#0F1F26" },
+        { label: "Gross profit", value: "$" + fmt(val(2)), fg: "#0F1F26" },
+        { label: "Operating income", value: "$" + fmt(val(6)), fg: val(6) < 0 ? "#A8262F" : "#0F1F26" },
+        { label: "Net margin", value: margin + "%", fg: margin < 0 ? "#A8262F" : "#14855F" }
+      ],
+      detailRows: rows, editing: s.editing, notEditing: !s.editing,
+      editLabel: s.editing ? "Done editing" : "Edit",
+      editBg: s.editing ? "#E9F1F1" : "#FFFFFF", editFg: s.editing ? "#0F4C5C" : "#33474D",
+      onToggleEdit: () => this.setState({ editing: !s.editing, saveState: s.editing ? "saved" : "idle" }),
+      saveLabel: s.saveState === "saving" ? "Saving…" : s.saveState === "saved" ? "All changes saved" : "",
+      saveFg: s.saveState === "saving" ? "#8A5A08" : "#14855F",
+      onDownload: () => this.toast(d.company + ".csv downloaded"),
+      onSortLabel: () => this.setState({ sort: "label", sortDir: s.sort === "label" ? -s.sortDir : 1 }),
+      onSortValue: () => this.setState({ sort: "value", sortDir: s.sort === "value" ? -s.sortDir : 1 }),
+      sortArrowLabel: s.sort === "label" ? (s.sortDir === 1 ? "↑" : "↓") : "",
+      sortArrowValue: s.sort === "value" ? (s.sortDir === 1 ? "↑" : "↓") : "",
+
+      deleteOpen: !!s.deleteId,
+      deleteBody: "“" + (d.filename || "") + "” and its extracted figures will be permanently removed. This cannot be undone.",
+      onAskDelete: () => this.setState({ deleteId: d.id }),
+      onCloseDelete: () => this.setState({ deleteId: null }),
+      onConfirmDelete: () => {
+        this.setState((st) => ({ reports: st.reports.filter((r) => r.id !== st.deleteId), deleteId: null, route: "dashboard" }));
+        this.toast("Report deleted", "#F0A5AB");
+      },
+
+      prefs: prefDef.map((pr) => ({
+        label: pr.label, help: pr.help, checked: s.prefs[pr.key],
+        trackBg: s.prefs[pr.key] ? "#17C98A" : "#D6DEDE",
+        knobLeft: s.prefs[pr.key] ? "23px" : "3px",
+        onToggle: () => this.setState((st) => ({ prefs: { ...st.prefs, [pr.key]: !st.prefs[pr.key] } }))
+      })),
+      apiKeyShown: s.showKey ? "pk_live_7Qd28fLm4XvR9pWn3ZbTyKc1" : "pk_live_••••••••••••••••••••••••",
+      keyToggleLabel: s.showKey ? "Hide" : "Reveal",
+      onToggleKey: () => this.setState({ showKey: !s.showKey }),
+      onCopyKey: () => this.toast("API key copied to clipboard"),
+
+      toasts: s.toasts.map((t) => ({
+        msg: t.msg, dot: t.dot,
+        onClose: () => this.setState((st) => ({ toasts: st.toasts.filter((x) => x.id !== t.id) }))
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>
