@@ -14,6 +14,8 @@ export function ReportsProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [loaded, setLoaded] = useState(false);
+  const [uploadCount, setUploadCount] = useState(0);
+  const [maxUploads, setMaxUploads] = useState(2);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -21,6 +23,8 @@ export function ReportsProvider({ children }) {
     try {
       const res = await api.listReports();
       setReports(res?.reports || res || []);
+      if (typeof res?.uploadCount === 'number') setUploadCount(res.uploadCount);
+      if (typeof res?.maxUploads === 'number') setMaxUploads(res.maxUploads);
       setLoaded(true);
     } catch (e) {
       setError(e.message);
@@ -50,9 +54,27 @@ export function ReportsProvider({ children }) {
     });
   }, []);
 
+  /** Called after a successful /upload response so the cap updates without a refetch. */
+  const recordUpload = useCallback((count) => {
+    if (typeof count === 'number') setUploadCount(count);
+  }, []);
+
+  const uploadsRemaining = Math.max(0, maxUploads - uploadCount);
+
   const value = useMemo(
-    () => ({ reports, loading, error, refresh, removeReport, upsertReport }),
-    [reports, loading, error, refresh, removeReport, upsertReport],
+    () => ({
+      reports,
+      loading,
+      error,
+      refresh,
+      removeReport,
+      upsertReport,
+      uploadCount,
+      maxUploads,
+      uploadsRemaining,
+      recordUpload,
+    }),
+    [reports, loading, error, refresh, removeReport, upsertReport, uploadCount, maxUploads, uploadsRemaining, recordUpload],
   );
 
   return <ReportsContext.Provider value={value}>{children}</ReportsContext.Provider>;

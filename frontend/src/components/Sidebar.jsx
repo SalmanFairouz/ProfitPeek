@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useReports } from '../context/ReportsContext';
 
 const LINKS = [
   { to: '/dashboard', label: 'Dashboard' },
@@ -19,6 +20,9 @@ const linkClass = ({ isActive }) =>
  * Mobile navigation lives in <BottomNav /> at the foot of AppLayout.
  */
 export default function Sidebar({ open = false, onClose, onUploadClick }) {
+  const { uploadsRemaining, maxUploads } = useReports();
+  const atLimit = uploadsRemaining <= 0;
+
   return (
     <>
       {open ? (
@@ -47,16 +51,24 @@ export default function Sidebar({ open = false, onClose, onUploadClick }) {
           <span className="text-[15px] font-semibold tracking-tight text-slate-900">Profit Peak</span>
         </div>
 
-        <button
-          type="button"
-          onClick={onUploadClick}
-          className="flex h-11 items-center justify-center gap-2 rounded-xl bg-accent-500 text-[15px] font-semibold text-brand-950 transition-colors hover:bg-accent-600 active:translate-y-px focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-600"
-        >
-          <span aria-hidden="true" className="text-lg leading-none">
-            +
-          </span>
-          Upload New PDF
-        </button>
+        <div className="flex flex-col gap-1.5">
+          <button
+            type="button"
+            onClick={onUploadClick}
+            disabled={atLimit}
+            aria-disabled={atLimit}
+            title={atLimit ? `Upload limit reached (${maxUploads} max on this demo)` : undefined}
+            className="flex h-11 items-center justify-center gap-2 rounded-xl bg-accent-500 text-[15px] font-semibold text-brand-950 transition-colors hover:bg-accent-600 active:translate-y-px focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-600 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400 disabled:hover:bg-slate-200"
+          >
+            <span aria-hidden="true" className="text-lg leading-none">
+              +
+            </span>
+            Upload New PDF
+          </button>
+          <p className="px-1 text-center text-[12px] text-slate-400">
+            {atLimit ? 'Upload limit reached' : `${uploadsRemaining} of ${maxUploads} uploads left`}
+          </p>
+        </div>
 
         <div className="flex flex-col gap-1">
           {LINKS.map((l) => (

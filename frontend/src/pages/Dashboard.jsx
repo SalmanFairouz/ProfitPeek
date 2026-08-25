@@ -14,7 +14,8 @@ const idOf = (r) => String(r.id ?? r._id);
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const { reports, loading, error, refresh, removeReport } = useReports();
+  const { reports, loading, error, refresh, removeReport, uploadsRemaining, maxUploads } = useReports();
+  const atLimit = uploadsRemaining <= 0;
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -54,15 +55,22 @@ export default function Dashboard() {
             {loading ? 'Loading your reports…' : `You have ${reports.length} ${reports.length === 1 ? 'report' : 'reports'}.`}
           </p>
         </div>
-        <Button size="lg" onClick={() => navigate('/upload')} leftIcon={<span aria-hidden="true">↑</span>}>
+        <Button
+          size="lg"
+          disabled={atLimit}
+          title={atLimit ? `Upload limit reached (${maxUploads} max on this demo)` : undefined}
+          onClick={() => navigate('/upload')}
+          leftIcon={<span aria-hidden="true">↑</span>}
+        >
           Upload New PDF
         </Button>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <CardStat label="Statements" value={String(reports.length)} />
         <CardStat label="Line items extracted" value={String(reports.length * 10)} />
         <CardStat label="Latest upload" value={reports[0] ? formatDate(reports[0].createdAt || reports[0].uploadedAt) : '—'} />
+        <CardStat label="Uploads used" value={`${maxUploads - uploadsRemaining} / ${maxUploads}`} />
       </div>
 
       <section className="flex flex-col gap-4">
@@ -100,7 +108,7 @@ export default function Dashboard() {
               {query ? 'Try a different filename or company name.' : 'Upload your first income statement to get started.'}
             </p>
             {!query ? (
-              <Button className="mt-3" onClick={() => navigate('/upload')}>
+              <Button className="mt-3" disabled={atLimit} onClick={() => navigate('/upload')}>
                 Upload New PDF
               </Button>
             ) : null}

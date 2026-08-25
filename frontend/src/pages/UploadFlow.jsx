@@ -38,7 +38,7 @@ export default function UploadFlow({ onUploadSuccess }) {
   const timer = useRef(null);
   const toast = useToast();
   const navigate = useNavigate();
-  const { upsertReport } = useReports();
+  const { upsertReport, uploadsRemaining, maxUploads, recordUpload } = useReports();
 
   useEffect(() => () => clearInterval(timer.current), []);
 
@@ -64,6 +64,7 @@ export default function UploadFlow({ onUploadSuccess }) {
       clearInterval(timer.current);
       setProgress(100);
       const extracted = res.extractedData || res.data || {};
+      recordUpload(res.uploadCount);
       setResult({ reportId: res.reportId ?? res.id, extractedData: extracted });
       setRows(toRows(extracted));
       setMeta({
@@ -99,6 +100,24 @@ export default function UploadFlow({ onUploadSuccess }) {
       setSaving(false);
     }
   };
+
+  if (uploadsRemaining <= 0 && step === 1) {
+    return (
+      <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-5 py-8 md:px-10">
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">New extraction</h1>
+        <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-slate-300 bg-white px-8 py-16 text-center">
+          <p className="text-base font-semibold text-slate-900">Upload limit reached</p>
+          <p className="max-w-sm text-sm text-slate-500">
+            This demo allows {maxUploads} PDF extractions per account to keep AI costs bounded. Your existing reports
+            are still fully viewable and editable.
+          </p>
+          <Button className="mt-3" variant="secondary" onClick={() => navigate('/dashboard')}>
+            Back to dashboard
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-5 py-8 md:px-10">

@@ -2,13 +2,14 @@ const { z } = require("zod");
 const prisma = require("../lib/prisma");
 const serializeReport = require("../utils/serializeReport");
 const { incomeStatementSchema } = require("../schemas/incomeStatement");
+const { MAX_UPLOADS_PER_USER } = require("../constants");
 
 async function list(req, res) {
-  const reports = await prisma.report.findMany({
-    where: { userId: req.userId },
-    orderBy: { createdAt: "desc" },
-  });
-  res.json({ reports: reports.map(serializeReport) });
+  const [reports, user] = await Promise.all([
+    prisma.report.findMany({ where: { userId: req.userId }, orderBy: { createdAt: "desc" } }),
+    prisma.user.findUnique({ where: { id: req.userId }, select: { uploadCount: true } }),
+  ]);
+  res.json({ reports: reports.map(serializeReport), uploadCount: user.uploadCount, maxUploads: MAX_UPLOADS_PER_USER });
 }
 
 async function getOne(req, res) {

@@ -1,9 +1,11 @@
+const { PDFDocument } = require("pdf-lib");
 const prisma = require("../lib/prisma");
 const anthropic = require("../lib/anthropic");
 const serializeReport = require("../utils/serializeReport");
 const { LINE_ITEM_KEYS, incomeStatementSchema } = require("../schemas/incomeStatement");
+const { MAX_UPLOADS_PER_USER, MAX_PDF_PAGES } = require("../constants");
 
-const EXTRACTION_MODEL = "claude-sonnet-5";
+const EXTRACTION_MODEL = "claude-haiku-4-5";
 
 const EXTRACTION_TOOL = {
   name: "record_income_statement",
@@ -66,6 +68,26 @@ async function upload(req, res) {
     return res.status(400).json({ error: "No PDF file was uploaded" });
   }
 
+  const user = await prisma.user.findUnique({ where: { id: req.userId }, select: { uploadCount: true } });
+  if (user.uploadCount >= MAX_UPLOADS_PER_USER) {
+    return res.status(403).json({
+      error: `Upload limit reached (${MAX_UPLOADS_PER_USER} per account on this demo).`,
+      uploadCount: user.uploadCount,
+      maxUploads: MAX_UPLOADS_PER_USER,
+    });
+  }
+
+  let pageCount;
+  try {
+    const pdfDoc = await PDFDocument.load(req.file.buffer);
+    pageCount = pdfDoc.getPageCount();
+  } catch {
+    return res.status(400).json({ error: "Could not read this PDF. It may be corrupted." });
+  }
+  if (pageCount > MAX_PDF_PAGES) {
+    return res.status(400).json({ error: `PDF has ${pageCount} pages; this demo accepts up to ${MAX_PDF_PAGES}.` });
+  }
+
   let extractedData;
   try {
     extractedData = await extractIncomeStatement(req.file.buffer);
@@ -74,12 +96,18 @@ async function upload(req, res) {
     return res.status(502).json({ error: "Failed to extract data from this PDF. Try re-uploading it." });
   }
 
-  const report = await prisma.report.create({
-    data: { userId: req.userId, filename: req.file.originalname, data: extractedData },
-  });
+  const [report, updatedUser] = await prisma.$transaction([
+    prisma.report.create({ data: { userId: req.userId, filename: req.file.originalname, data: extractedData } }),
+    prisma.user.update({ where: { id: req.userId }, data: { uploadCount: { increment: 1 } }, select: { uploadCount: true } }),
+  ]);
 
   const serialized = serializeReport(report);
-  res.status(201).json({ reportId: serialized.id, extractedData: serialized.extractedData });
+  res.status(201).json({
+    reportId: serialized.id,
+    extractedData: serialized.extractedData,
+    uploadCount: updatedUser.uploadCount,
+    maxUploads: MAX_UPLOADS_PER_USER,
+  });
 }
 
 module.exports = { upload };

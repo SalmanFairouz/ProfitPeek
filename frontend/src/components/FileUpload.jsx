@@ -83,7 +83,8 @@ export default function FileUpload({ file, onFile, onClear, accept = 'applicatio
         </div>
         <span className="text-lg font-semibold tracking-tight text-slate-900">Drag your income statement here</span>
         <span className="text-sm text-slate-500">
-          PDF up to {formatBytes(maxBytes)} · or <span className="font-semibold text-brand-700 underline">browse files</span>
+          PDF up to {formatBytes(maxBytes)}, 5 pages max · or{' '}
+          <span className="font-semibold text-brand-700 underline">browse files</span>
         </span>
       </div>
 
