@@ -13,6 +13,14 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v7
 
+      - name: Audit backend packages
+        working-directory: backend
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Audit frontend packages
+        working-directory: frontend
+        run: npm audit --omit=dev --audit-level=high
+
       - name: Build backend image
         run: docker build -f Dockerfile.backend -t profitpeak-backend .
 
